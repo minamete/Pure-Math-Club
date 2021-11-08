@@ -1,14 +1,12 @@
-import initialSettings from "settings.json";
-const Discord = require('discord.js')
+const initialSettings = require("./settings.json");
+const Discord = require('discord.js');
 const fs = require('fs');
 var settings = initialSettings;
 
 // Make sure the intents are working!
 const bot = new Discord.Client({
-    ws: {
-        intents: ['GUILD_ROLE_CREATE', 'GUILD_ROLE_UPDATE', 'GUILD_ROLE_DELETE', 'GUILD_MEMBER_UPDATE', 'PRESENCE_UPDATE', 
-                  'MESSAGE_CREATE', 'MESSAGE_UPDATE', 'MESSAGE_DELETE', 'MESSAGE_REACTION_ADD', 'MESSAGE_REACTION_REMOVE']
-    },
+    intents: [Discord.Intents.FLAGS.GUILD_MEMBERS, Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_PRESENCES, Discord.Intents.FLAGS.GUILD_MESSAGES, 
+                  Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
     partials: ['MESSAGE','CHANNEL','REACTION', 'GUILD_MEMBER','USER']
 })
 
@@ -53,12 +51,16 @@ function respondToMessage(prefix, message, index) { //index here is referring to
 
     if(!message.member || !message.member.permissions.has("ADMINISTRATOR")) return "Error: you are not allowed to use this command!";
     // Basics
-    if(message.startsWith("changeprefix ")) { //Beware of excess spaces! 
-        message = message.substring(13);
+    if(message.startsWith("change-prefix ")) { //Beware of excess spaces! 
+        message = message.substring(14);
         settings[index].prefix = message;
         writeToSettings();
     }
     // Roles
+    if(message.startsWith("update-roles")) {
+        // I'll make this less shitty later
+
+    }
 }
 
 const HELPMESSAGE = "This is PMC's Bot (still under development)! Unfortunately, I'm too lazy to write out a help message."
@@ -81,4 +83,5 @@ function writeToSettings() {
     })
 }
 
-
+const secret = fs.readFileSync("secret.txt","utf8");
+bot.login(secret);
