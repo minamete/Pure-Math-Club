@@ -14,7 +14,7 @@ bot.on('ready', () => {
     console.log("Bonjour");
 });
 
-bot.on('messageCreated', async function (message) {
+bot.on('messageCreate', async function (message) {
     let currentGuild = message.guildId;
     if(currentGuild == null) return;
 
@@ -22,7 +22,7 @@ bot.on('messageCreated', async function (message) {
     for (let i = 0; i < settings.length; i++) {
         if(settings[i].guildID == currentGuild) {
             let response = respondToMessage(settings[i].prefix, message, i);
-            return response == undefined ? message.channel.send(response) : null; 
+            return response ? message.channel.send(response) : null; 
         }
     }
     
@@ -42,22 +42,22 @@ bot.on('messageCreated', async function (message) {
 })
 
 function respondToMessage(prefix, message, index) { //index here is referring to index of the guild in settings
-    if(!message.toLowerCase().startsWith(prefix.toLowerCase())) return;
-    message = message.substring(prefix.length).toLowerCase(); //assuming the prefix contains spaces
+    if(!message.content.toLowerCase().startsWith(prefix.toLowerCase())) return;
+    messageContent = message.content.substring(prefix.length).toLowerCase(); //assuming the prefix contains spaces
     // Non-restricted
-    if(message.startsWith("help")) {
+    if(messageContent.startsWith("help")) {
         return HELPMESSAGE;
     }
 
     if(!message.member || !message.member.permissions.has("ADMINISTRATOR")) return "Error: you are not allowed to use this command!";
     // Basics
-    if(message.startsWith("change-prefix ")) { //Beware of excess spaces! 
-        message = message.substring(14);
-        settings[index].prefix = message;
+    if(messageContent.startsWith("change-prefix ")) { //Beware of excess spaces! 
+        messageContent = messageContent.substring(14);
+        settings[index].prefix = messageContent;
         writeToSettings();
     }
     // Roles
-    if(message.startsWith("update-roles")) {
+    if(messageContent.startsWith("update-roles")) {
         // I'll make this less shitty later
 
     }
