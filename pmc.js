@@ -11,52 +11,9 @@ const bot = new Discord.Client({
 })
 
 bot.on('ready', async () => {
-    console.log("Bonjour");
     // If there aren't any emoji reactions under the role messages, add them
 
-    for(let i = 0; i < settings.length; i++) {
-        // each guild
-        let currentGuild = await bot.guilds.fetch(settings[i].guildID);
-        for(let k = 0; k < settings[i].roles.length; k++) {
-            let guildChannels = await currentGuild.channels.fetch(); // this is a map!
-            guildChannels.forEach(async (channel) => {
-                if(channel.type != "GUILD_TEXT") return;
-                try {
-                    let channelMessages = await channel.messages.fetch(settings[i].roles[k].messageID);
-                    if(channelMessages != undefined) {
-                         // if the message exists, check if the emoji exists
-                         let messageReactions = await channelMessage.reactions.fetch();
-                         messageReactions.forEach(async reaction => {
-                                if(reaction.emoji.name == settings[i].roles[k].emoji) {
-                                    // if the emoji exists, check if the role exists
-                                    let role = await currentGuild.roles.fetch(settings[i].roles[k].roleID);
-                                    if(!role) {
-                                        console.log("Error: role doesn't exist");
-                                        return;
-                                    }
-                                    // if the role exists, check if the reaction is already added
-                                    let roleReactions = await reaction.users.fetch();
-                                    roleReactions.forEach(async user => {
-                                        if(user.id == role.id) {
-                                            // if the reaction is already added, return
-                                            return;
-                                        }
-                                    })
-                                    // if the reaction is not added, add it
-                                    await reaction.users.fetch();
-                                    await reaction.users.add(role);
-                                }
-                         })
-                         
-                    }
-                } catch(e) {
-                    //i can't believe this. i'm using a try/catch block to check if the message exists. this is the lowest point of my life
-                }
-                
-            })
-        }
-        
-    }
+    await addReactionsToRoleMessages(bot);
 });
 
 bot.on('messageCreate', async function (message) {
@@ -108,6 +65,10 @@ function respondToMessage(prefix, message, index) { //index here is referring to
     }
 }
 
+bot.on('messageReactionAdd', async (messageReaction, user) => {
+    
+})
+
 const HELPMESSAGE = "This is PMC's Bot (still under development)! Unfortunately, I'm too lazy to write out a help message."
 
 async function readFromSettings() {
@@ -126,6 +87,32 @@ function writeToSettings() {
             console.log(err);
         } 
     })
+}
+
+async function addReactionsToRoleMessages(bot) {
+    for(let i = 0; i < settings.length; i++) {
+        // each guild
+        let currentGuild = await bot.guilds.fetch(settings[i].guildID);
+        for(let k = 0; k < settings[i].roles.length; k++) {
+            let guildChannels = await currentGuild.channels.fetch(); // this is a map!
+            guildChannels.forEach(async (channel) => {
+                if(channel.type != "GUILD_TEXT") return;
+                try {
+                    let channelMessage = await channel.messages.fetch(settings[i].roles[k].messageID);
+                    // if the message exists, check if the emoji exists
+                    let messageReactions = channelMessage.reactions.cache;
+                    if(!messageReactions.has(settings[i].roles[k].emoji)) {
+                        channelMessage.react(settings[i].roles[k].emoji)
+                    }
+                } catch(e) {
+                    //i can't believe this. i'm using a try/catch block to check if the message exists. this is the lowest point of my life
+                    //the errors here will be of the message not being found in the channel, or the message id being invalid. thus we don't care if there's actually an error
+                }
+                
+            })
+        }
+        
+    }
 }
 
 const secret = fs.readFileSync("secret.txt","utf8");
