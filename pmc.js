@@ -71,7 +71,7 @@ function respondToMessage(prefix, message, index) { //index here is referring to
 bot.on('messageReactionAdd', async (messageReaction, user) => {
     if(messageReaction.message.partial) await messageReaction.message.fetch();
     if(messageReaction.partial) await messageReaction.fetch();
-
+    if(user.bot) return;
     // Find message in the settings; if it's not there, then return
     let messageGuildID = messageReaction.message.guildId
     if(!settings.find(guild => guild.guildID == messageGuildID)) return; //if the message guild isn't in settings
@@ -84,6 +84,10 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
             let role = await messageReaction.message.guild.roles.fetch(settings[index].roles[roleIndex].roleID);
             if(!member.roles.cache.has(role.id)) {
                 member.roles.add(role.id);
+                messageReaction.users.remove(user);
+            } else {
+                member.roles.remove(role.id);
+                messageReaction.users.remove(user);
             }
         }
     }
@@ -91,7 +95,7 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
     return; // if the message isn't in the settings
 })
 
-const HELPMESSAGE = "This is PMC's Bot (still under development)! Unfortunately, I'm too lazy to write out a help message."
+const HELPMESSAGE = "This is PMC's Bot (still under development)! React to a role once to get the role, and twice to get rid of the role. \nUnfortunately, I'm too lazy to write out a help message."
 
 async function readFromSettings() {
     tempSettings = await fs.readFileSync("./settings.json", 'utf-8', function(err, data) {
