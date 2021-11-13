@@ -2,5 +2,8 @@
   "dependencies": {
     "discord.js": "^13.3.1",
     "fs": "^0.0.1-security"
+  },
+  "scripts": {
+    "start": "node pmc.js"
   }
 }

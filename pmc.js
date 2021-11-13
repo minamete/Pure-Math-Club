@@ -50,6 +50,9 @@ function respondToMessage(prefix, message, index) { //index here is referring to
     if(messageContent.startsWith("help")) {
         return HELPMESSAGE;
     }
+    if(messageContent.startsWith("role-add ")) {
+
+    }
 
     if(!message.member || !message.member.permissions.has("ADMINISTRATOR")) return "Error: you are not allowed to use this command!";
     // Basics
