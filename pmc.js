@@ -10,8 +10,53 @@ const bot = new Discord.Client({
     partials: ['MESSAGE','CHANNEL','REACTION', 'GUILD_MEMBER','USER']
 })
 
-bot.on('ready', () => {
+bot.on('ready', async () => {
     console.log("Bonjour");
+    // If there aren't any emoji reactions under the role messages, add them
+
+    for(let i = 0; i < settings.length; i++) {
+        // each guild
+        let currentGuild = await bot.guilds.fetch(settings[i].guildID);
+        for(let k = 0; k < settings[i].roles.length; k++) {
+            let guildChannels = await currentGuild.channels.fetch(); // this is a map!
+            guildChannels.forEach(async (channel) => {
+                if(channel.type != "GUILD_TEXT") return;
+                try {
+                    let channelMessages = await channel.messages.fetch(settings[i].roles[k].messageID);
+                    if(channelMessages != undefined) {
+                         // if the message exists, check if the emoji exists
+                         let messageReactions = await channelMessage.reactions.fetch();
+                         messageReactions.forEach(async reaction => {
+                                if(reaction.emoji.name == settings[i].roles[k].emoji) {
+                                    // if the emoji exists, check if the role exists
+                                    let role = await currentGuild.roles.fetch(settings[i].roles[k].roleID);
+                                    if(!role) {
+                                        console.log("Error: role doesn't exist");
+                                        return;
+                                    }
+                                    // if the role exists, check if the reaction is already added
+                                    let roleReactions = await reaction.users.fetch();
+                                    roleReactions.forEach(async user => {
+                                        if(user.id == role.id) {
+                                            // if the reaction is already added, return
+                                            return;
+                                        }
+                                    })
+                                    // if the reaction is not added, add it
+                                    await reaction.users.fetch();
+                                    await reaction.users.add(role);
+                                }
+                         })
+                         
+                    }
+                } catch(e) {
+                    //i can't believe this. i'm using a try/catch block to check if the message exists. this is the lowest point of my life
+                }
+                
+            })
+        }
+        
+    }
 });
 
 bot.on('messageCreate', async function (message) {
@@ -58,8 +103,8 @@ function respondToMessage(prefix, message, index) { //index here is referring to
     }
     // Roles
     if(messageContent.startsWith("update-roles")) {
-        // I'll make this less shitty later
-
+        // I'll make this command later
+        // Intended to input things into the setting.json file
     }
 }
 
