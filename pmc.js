@@ -66,7 +66,26 @@ function respondToMessage(prefix, message, index) { //index here is referring to
 }
 
 bot.on('messageReactionAdd', async (messageReaction, user) => {
-    
+    if(messageReaction.message.partial) await messageReaction.message.fetch();
+    if(messageReaction.partial) await messageReaction.fetch();
+
+    // Find message in the settings; if it's not there, then return
+    let messageGuildID = messageReaction.message.guildId
+    if(!settings.find(guild => guild.guildID == messageGuildID)) return; //if the message guild isn't in settings
+    let index = settings.indexOf(settings.find(guild => guild.guildID == messageGuildID));
+    if(!(!(settings[index].roles.find(role => role.messageID == messageReaction.message.id)))) { // I'm sorry
+        let roleIndex = settings[index].roles.indexOf(settings[index].roles.find(role => role.messageID == messageReaction.message.id));
+        if(messageReaction.emoji.name == settings[index].roles[roleIndex].emoji) {
+            let server = await bot.guilds.fetch(messageGuildID);
+            let member = await server.members.fetch(user);
+            let role = await messageReaction.message.guild.roles.fetch(settings[index].roles[roleIndex].roleID);
+            if(!member.roles.cache.has(role.id)) {
+                member.roles.add(role.id);
+            }
+        }
+    }
+
+    return; // if the message isn't in the settings
 })
 
 const HELPMESSAGE = "This is PMC's Bot (still under development)! Unfortunately, I'm too lazy to write out a help message."
