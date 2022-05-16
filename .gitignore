@@ -2,3 +2,4 @@ secret.txt
 settings.json
 app.yaml
 .env
+node_modules
