@@ -1,1 +1,6 @@
 .env
+id_rsa
+id_rsa.pem
+id_rsa.pub
+id_rsa.pub.pem
+pkcs8
