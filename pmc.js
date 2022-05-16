@@ -12,7 +12,6 @@ const bot = new Discord.Client({
 
 bot.on('ready', async () => {
     // If there aren't any emoji reactions under the role messages, add them
-
     await addReactionsToRoleMessages();
 });
 
@@ -137,7 +136,6 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
             }
         }
     }
-
     return; // if the message isn't in the settings
 })
 
