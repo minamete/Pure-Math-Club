@@ -1,3 +1,6 @@
+// This file will have mostly listeners in it.
+
+const HELPMESSAGE = require("./constants/help.mjs")
 const initialSettings = require("./settings.json");
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -56,10 +59,7 @@ async function respondToMessage(prefix, message, index) { //index here is referr
     if(!message.member || !message.member.permissions.has("ADMINISTRATOR")) return "You do not have permission to use this command!";
     // Basics
     if(messageContent.startsWith("change-prefix ")) { //Beware of excess spaces! 
-        messageContent = messageContent.substring(14);
-        settings[index].prefix = messageContent;
-        writeToSettings();
-        return "Prefix successfully changed to " + messageContent;
+        
     }
     // Roles
     if(messageContent.startsWith("new-role")) {
@@ -138,8 +138,6 @@ bot.on('messageReactionAdd', async (messageReaction, user) => {
     }
     return; // if the message isn't in the settings
 })
-
-const HELPMESSAGE = "This is PMC's Bot (still under development)! React to a role once to get the role, and twice to get rid of the role. \nUnfortunately, I'm too lazy to write out a help message."
 
 async function readFromSettings() {
     tempSettings = await fs.readFileSync("./settings.json", 'utf-8', function(err, data) {
