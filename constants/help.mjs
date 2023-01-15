@@ -1,0 +1,2 @@
+const HELPMESSAGE = "This is PMC's Bot (still under development)! React to a role once to get the role, and twice to get rid of the role. \nUnfortunately, I'm too lazy to write out a help message."
+export default HELPMESSAGE
